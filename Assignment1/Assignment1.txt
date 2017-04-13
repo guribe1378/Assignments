@@ -1,0 +1,15 @@
+create tablespace vehicles_fleet 
+datafile 'fleet1.dbf' size 500M,
+'fleet2.dbf' size 500M;
+
+create tablespace test_purposes
+datafile 'purpose.dbf' size 500M;
+
+create tablespace test_purposesborrado
+datafile 'purposeborrado.dbf' size 5M;
+
+drop tablespace test_purposesborrado including contents and datafiles;
+
+create user usuarioDBA identified by sistemas123 default tablespace vehicles_fleet quota unlimited on vehicles_fleet;
+grant DBA TO usuarioDBA;
+
