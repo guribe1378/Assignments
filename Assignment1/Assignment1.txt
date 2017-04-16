@@ -30,6 +30,30 @@ PASSWORD_LIFE_TIME 20 IDLE_TIME 10 FAILED_LOGIN_ATTEMPTS 3 ;
 CREATE PROFILE DEVELOPMENT limit SESSIONS_PER_USER 1
 PASSWORD_LIFE_TIME 100 IDLE_TIME 30 ;
 
+CREATE ROLE WITHOUT_PRIVILEGES;
+REVOKE ALL PRIVILEGES;
+
+create user usuario1 identified by sistemas123 default tablespace vehicles_fleet
+profile manager_profile ;
+GRANT WITHOUT_PRIVILEGES TO usuario1;
+
+create user usuario2 identified by sistemas123 default tablespace vehicles_fleet
+profile finance_profile;
+GRANT WITHOUT_PRIVILEGES TO usuario2;
+
+create user usuario3 identified by sistemas123 default tablespace vehicles_fleet
+profile service_profile;
+GRANT WITHOUT_PRIVILEGES TO usuario3;
+
+create user usuario4 identified by sistemas123 default tablespace vehicles_fleet
+profile development;
+GRANT WITHOUT_PRIVILEGES TO usuario4;
+
+alter user usuario1  ACCOUNT LOCK;
+alter user usuario2  ACCOUNT LOCK;
+alter user usuario3  ACCOUNT LOCK;
+
+DROP TABLESPACE test_purposes  INCLUDING CONTENTS CASCADE CONSTRAINTS;
 
 
 
