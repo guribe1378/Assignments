@@ -80,7 +80,7 @@ CREATE TABLE ESTADO_TIPO_SERVICIOS
 INSERT INTO ESTADO_TIPO_SERVICIOS VALUES ('1','Terminado');
 INSERT INTO ESTADO_TIPO_SERVICIOS VALUES ('2','Programado');
 INSERT INTO ESTADO_TIPO_SERVICIOS VALUES ('3','Reparacion');
-INSERT INTO ESTADO_TIPO_SERVICIOS VALUES ('3','Observacion');
+INSERT INTO ESTADO_TIPO_SERVICIOS VALUES ('4','Observacion');
 
 CREATE TABLE ESTADO_SERVCIOS 
 (
@@ -441,5 +441,25 @@ INSERT INTO RECLAMOS_SEGUROS VALUES ('7','1006','27032017','01042017','5000000',
 INSERT INTO RECLAMOS_SEGUROS VALUES ('8','1007','01042017','06042017','4500000','2','1','12','lesiones','terceros');
 INSERT INTO RECLAMOS_SEGUROS VALUES ('9','1008','19042017','24042017','3000000','2','1','11','lesiones','terceros');
 INSERT INTO RECLAMOS_SEGUROS VALUES ('10','1009','24042017','29042017','1500000','2','1','10','lesiones','terceros');
+
+
+create or replace FUNCTION service(kilometraje int)
+return varchar
+is
+name varchar(30);
+BEGIN
+name := kilometraje||'_service';
+return name;
+END;
+
+DECLARE
+cursor cursor1 is select kilometraje from VEHICULOS;
+BEGIN
+for vehiculo IN cursor1
+LOOP
+dbms_output.put_line(service(vehiculo.kilometraje));
+END LOOP;
+
+END;
 
 
