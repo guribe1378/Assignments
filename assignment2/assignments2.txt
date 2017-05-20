@@ -462,7 +462,7 @@ END LOOP;
 
 END;
 
-create or replace procedure proc_vehicule(id in int)
+create or replace procedure proc_vehicule(id in numeric)
 is
 cursor cursor1 is select ID_VEHICULO,kilometraje from VEHICULOS;
 servicename varchar(30);
@@ -486,6 +486,15 @@ else
     end if;
 end if;
 END LOOP;
+
+end;
+
+create or replace trigger updatekilometer
+after update of kilometraje on vehiculos
+for each row
+begin
+
+  proc_vehicule(2);
 
 end;
 
