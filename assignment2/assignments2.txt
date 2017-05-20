@@ -1,3 +1,4 @@
+--------------------------------------------------------------------------2--------------------------------------------------------------
 CREATE TABLE TIPO_VEHICULOS 
 (
   ID_TIPO_VEH INTEGER NOT NULL
@@ -392,6 +393,7 @@ CREATE TABLE RECLAMOS_SEGUROS
 , ID_VEHICULO INTEGER NOT NULL 
 , NATURALEZA_DEL_PAGO VARCHAR2(120 BYTE) 
 , DAÑOS_Y_PREJUICIOS VARCHAR2(120 BYTE) 
+, COSTOS_REPARACION INTEGER NOT NULL 
 , CONSTRAINT RECLAMOS_SEGUROS_PK PRIMARY KEY 
   (
     ID_RECLAMO_SEGURO 
@@ -431,15 +433,73 @@ REFERENCES TIPO_RECLAMO_SEGUROS
 )
 ENABLE;
 
-INSERT INTO RECLAMOS_SEGUROS VALUES ('1','1000','28022017','04032017','0','2','2','2','','');
-INSERT INTO RECLAMOS_SEGUROS VALUES ('2','1001','10032017','15032017','0','2','2','4','','');
-INSERT INTO RECLAMOS_SEGUROS VALUES ('3','1002','10032017','15032017','1200000','1','1','6','lesiones','terceros');
-INSERT INTO RECLAMOS_SEGUROS VALUES ('4','1003','12032017','17032017','0','2','2','1','','');
-INSERT INTO RECLAMOS_SEGUROS VALUES ('5','1004','17032017','22032017','0','2','2','3','','');
-INSERT INTO RECLAMOS_SEGUROS VALUES ('6','1005','24032017','29032017','0','2','2','5','','');
-INSERT INTO RECLAMOS_SEGUROS VALUES ('7','1006','27032017','01042017','5000000','2','1','9','lesiones','terceros');
-INSERT INTO RECLAMOS_SEGUROS VALUES ('8','1007','01042017','06042017','4500000','2','1','12','lesiones','terceros');
-INSERT INTO RECLAMOS_SEGUROS VALUES ('9','1008','19042017','24042017','3000000','2','1','11','lesiones','terceros');
-INSERT INTO RECLAMOS_SEGUROS VALUES ('10','1009','24042017','29042017','1500000','2','1','10','lesiones','terceros');
+INSERT INTO RECLAMOS_SEGUROS VALUES ('1','1000','28022017','04032017','0','2','2','2','','','50000');
+INSERT INTO RECLAMOS_SEGUROS VALUES ('2','1001','10032017','15032017','0','2','2','4','','','120000');
+INSERT INTO RECLAMOS_SEGUROS VALUES ('3','1002','10032017','15032017','1200000','1','1','6','lesiones','terceros','0');
+INSERT INTO RECLAMOS_SEGUROS VALUES ('4','1003','12032017','17032017','0','2','2','1','','','129000');
+INSERT INTO RECLAMOS_SEGUROS VALUES ('5','1004','17032017','22032017','0','2','2','3','','','25900');
+INSERT INTO RECLAMOS_SEGUROS VALUES ('6','1005','24032017','29032017','0','2','2','5','','','45000');
+INSERT INTO RECLAMOS_SEGUROS VALUES ('7','1006','27032017','01042017','5000000','2','1','9','lesiones','terceros','0');
+INSERT INTO RECLAMOS_SEGUROS VALUES ('8','1007','01042017','06042017','4500000','2','1','12','lesiones','terceros','0');
+INSERT INTO RECLAMOS_SEGUROS VALUES ('9','1008','19042017','24042017','3000000','2','1','11','lesiones','terceros','0');
+INSERT INTO RECLAMOS_SEGUROS VALUES ('10','1009','24042017','29042017','1500000','2','1','10','lesiones','terceros','0');
 
+CREATE PROFILE DPTO_DIRECTORES limit SESSIONS_PER_USER 1
+PASSWORD_LIFE_TIME 40 IDLE_TIME 15 FAILED_LOGIN_ATTEMPTS 4 ;
+
+CREATE PROFILE DPTO_FINANZAS limit SESSIONS_PER_USER 1
+PASSWORD_LIFE_TIME 15 IDLE_TIME 5 FAILED_LOGIN_ATTEMPTS 2 ;
+
+CREATE PROFILE DPTO_SERVICIO limit SESSIONS_PER_USER 1
+PASSWORD_LIFE_TIME 20 IDLE_TIME 10 FAILED_LOGIN_ATTEMPTS 3 ;
+
+-----------------------------------------------------------------------------4------------------------------------------------------------------------------
+CREATE VIEW VISTA_FINANCIEROS
+AS
+ select PLACA, KILOMETRAJE, MODELO_AÑO_VEH MODELO, VALOR_ACTUAL, VALOR_DE_REEMPLAZO, 
+ TIPO_VEHICULOS.DESC_TIPO_VEH  TIPO, ESTADO_VEHICULOS.DESC_ESTADO_VEH ESTADO, COUNT(RECLAMOS_SEGUROS.ID_VEHICULO)"NUMERO DE SERVICIOS",
+ SUM (RECLAMOS_SEGUROS.COSTOS_REPARACION)"COSTOS REPARACION"  from  vehiculos
+ INNER JOIN TIPO_VEHICULOS ON vehiculos.ID_TIPO_VEH = TIPO_VEHICULOS.ID_TIPO_VEH 
+ INNER JOIN ESTADO_VEHICULOS ON vehiculos.ID_ESTADO_VEH = ESTADO_VEHICULOS.ID_ESTADO_VEH
+ INNER JOIN RECLAMOS_SEGUROS ON vehiculos.ID_VEHICULO = RECLAMOS_SEGUROS.ID_VEHICULO 
+ WHERE VEHICULOS.ID_TIPO_VEH IN ('4','5','6','7','8') AND vehiculos.FECHA_COMPRA_VEH > '01012015'
+ group by PLACA, KILOMETRAJE, MODELO_AÑO_VEH, VALOR_ACTUAL, VALOR_DE_REEMPLAZO, 
+TIPO_VEHICULOS.DESC_TIPO_VEH, ESTADO_VEHICULOS.DESC_ESTADO_VEH, RECLAMOS_SEGUROS.COSTOS_REPARACION
+ORDER BY KILOMETRAJE DESC;
+
+
+
+----------------------------------------------------------------------------5----------------------------------------------------------------------------------
+create or replace FUNCTION service(kilometraje int)
+return varchar
+is
+name varchar(30);
+BEGIN
+name := kilometraje||'_service';
+return name;
+END;
+
+DECLARE
+cursor cursor1 is select kilometraje from VEHICULOS;
+BEGIN
+for vehiculo IN cursor1
+LOOP
+if vehiculo.kilometraje < '9000' then
+vehiculo.kilometraje:= '9000';
+else
+if vehiculo.kilometraje > '9000' and vehiculo.kilometraje < '20000 'then
+vehiculo.kilometraje:= '20000';
+else
+if vehiculo.kilometraje > '20000' and vehiculo.kilometraje < '50000 'then
+vehiculo.kilometraje:= '50000';
+else
+if vehiculo.kilometraje > '50000' and vehiculo.kilometraje < '1000000 'then
+vehiculo.kilometraje:= '100000';
+end if;
+end if;
+end if;
+end if;
+dbms_output.put_line(service(vehiculo.kilometraje));
+END LOOP;
+END;
 
