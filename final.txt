@@ -1,0 +1,30 @@
+CREATE TABLE masks 
+(
+  mask varchar2(1000 BYTE) 
+, result VARCHAR2(4000 BYTE) )
+
+
+create or replace function mask_function (s in string)
+  return varchar2
+IS 
+begin 
+if 1<= inputstring.length and inputstring.length <=10000 then 
+if s = ('*0') then
+s:=REPLACE('*0','*','1');
+to_number(s);
+if mod (s,6)<>0 then
+return 'no es divisible por 6';
+else
+return dbms_output.put_line(mask_function);
+end if;
+end if;
+end;
+
+
+create or replace trigger tg_llamar_mask_function
+before insert on masks 
+begin
+
+  mask_function (result);
+  
+end;
